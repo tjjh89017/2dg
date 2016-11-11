@@ -66,4 +66,7 @@ var page = new Crawler({
 
 var page_list = process.argv.slice(2);
 //console.log(page_list);
-page.queue(page_list);
+if(page_list.length > 0)
+    page.queue(page_list);
+else
+    console.log("node index.js <2dg-url>")
