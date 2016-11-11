@@ -20,7 +20,10 @@
   "dependencies": {
     "crawler": "^0.4.3",
     "fs": "0.0.1-security",
+    "node-progress-bars": "^1.0.0",
     "request": "^2.78.0",
+    "request-progress": "^2.0.1",
+    "string-width": "^2.0.0",
     "unpacker": "^0.1.1"
   }
 }

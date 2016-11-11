@@ -3,6 +3,19 @@ const fs = require("fs")
 const vm = require('vm')
 const request = require('request')
 const unpack = require('unpacker').unpack
+const progress = require('request-progress')
+const ProgressBar = require('node-progress-bars')
+const stringWidth = require('string-width')
+
+function right_pad(str, len, padding_chr) {
+    padding_chr = padding_chr || ' '
+    var curr_size = stringWidth(str)
+    var padding_len = len - curr_size
+    if (padding_len <= 0) {
+        return str
+    }
+    return str + new Array(padding_len + 1).join(padding_chr)
+}
 
 var video_callback = function(dir, name){
     return function(error, result, $){
@@ -28,9 +41,29 @@ var video_callback = function(dir, name){
         var label = url.label
         var filename = dir + "/[" + name + "][" + label + "]." + type
         var file = fs.createWriteStream(filename)
-        console.log(filename)
-        request(url.file)
-            .on('end', function(){
+        var display_name = dir + ' - ' + name
+        var bar_format = right_pad(display_name, 40) + ".white[:bar].green :percent.yellow :ets sec :speed kB/s"
+        var progress_bar, last_tick = 0
+
+        progress(request(url.file))
+            .on('progress', function (state) {
+                if (!progress_bar) {
+                    progress_bar = new ProgressBar({
+						schema: bar_format,
+                        width: 50,
+						filled: '#',
+						blank: ' ',
+                        total: state.size.total
+                    })
+                }
+                var delta_tick = state.size.transferred - last_tick
+                progress_bar.tick(delta_tick, {
+					speed: (state.speed / 1000).toFixed(2),
+					ets: state.time.remaining
+				})
+                last_tick = state.size.transferred
+            })
+            .on('end', function () {
                 console.log(filename + " done!")
             })
             .pipe(file)
