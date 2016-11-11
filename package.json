@@ -1,0 +1,26 @@
+{
+  "name": "2dg",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tjjh89017/2dg.git"
+  },
+  "author": "Yu-Chiang Huang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tjjh89017/2dg/issues"
+  },
+  "homepage": "https://github.com/tjjh89017/2dg#readme",
+  "dependencies": {
+    "crawler": "^0.4.3",
+    "fs": "0.0.1-security",
+    "request": "^2.78.0",
+    "unpacker": "^0.1.1"
+  }
+}
