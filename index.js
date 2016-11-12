@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const Crawler = require("crawler")
 const fs = require("fs")
 const vm = require('vm')
