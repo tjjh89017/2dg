@@ -49,18 +49,18 @@ var video_callback = function(dir, name){
             .on('progress', function (state) {
                 if (!progress_bar) {
                     progress_bar = new ProgressBar({
-						schema: bar_format,
+                        schema: bar_format,
                         width: 50,
-						filled: '#',
-						blank: ' ',
+                        filled: '#',
+                        blank: ' ',
                         total: state.size.total
                     })
                 }
                 var delta_tick = state.size.transferred - last_tick
                 progress_bar.tick(delta_tick, {
-					speed: (state.speed / 1000).toFixed(2),
-					ets: state.time.remaining
-				})
+                    speed: (state.speed / 1000).toFixed(2),
+                    ets: state.time.remaining
+                })
                 last_tick = state.size.transferred
             })
             .on('end', function () {
