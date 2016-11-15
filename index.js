@@ -78,11 +78,10 @@ var video = new Crawler({
 var page = new Crawler({
     forceUTF8: true,
     callback: function(error, result, $){
-        name = /([^\[]*)\[.*\](\[.*\])(\[.*\])/.exec($('a#thread_subject').text())
+        name = /^([^\[]*)\[.*\[.*\]\]\W+\](\[.*\])?$/.exec($('a#thread_subject').text())
         anime_name = (name[1] == undefined ? '' : name[1].trim())
-        episodes = (name[2] == undefined ? '' : name[2].trim())
-        anime_status = (name[3] == undefined ? '' : name[3].trim())
-        dir = "[" + anime_name + "]" + episodes + anime_status
+        anime_status = (name[2] == undefined ? '' : name[2].trim())
+        dir = "[" + anime_name + "]" + anime_status
         fs.existsSync(dir) || fs.mkdirSync(dir)
 
         $('a[href|="/thread"]').each(function(index, a){
