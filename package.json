@@ -1,6 +1,6 @@
 {
   "name": "2dg",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -25,5 +25,8 @@
     "request-progress": "^2.0.1",
     "string-width": "^2.0.0",
     "unpacker": "^0.1.1"
+  },
+  "bin": {
+    "2dg": "./index.js"
   }
 }
