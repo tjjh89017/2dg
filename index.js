@@ -20,21 +20,26 @@ function right_pad(str, len, padding_chr) {
 
 var video_callback = function(dir, anime_name, episode_number){
     return function(error, result, $){
-        //console.log(result)
-        //console.log(dir)
-        //console.log(name)
+        if (debug_mode) {
+            logger.write('result: ' + result + '\n')
+            logger.write('dir: ' + dir + '\n')
+            logger.write('name: ' + name + '\n')
+        }
 
-        //console.log(result)
-        //console.log($("script").last().text())
         // parse js code
         //var code = /eval\((.*)\);/.exec($("script").last().text())[1]
         var code = $("script").last().text()
-        //console.log(code)
+        if (debug_mode) {
+            logger.write('code: ' + code + '\n')
+        }
         code = unpack(code)
         code = code.replace(/player\.on(.|[\n\r])*/, '')
         code = code.replace(/var player=jwplayer\('videoContainer'\);/, '')
         code = code.replace(/player.setup\(playerSetup\)/, '')
-        //console.log(code)
+        if (debug_mode) {
+            logger.write('code: ' + code + '\n')
+        }
+
         const sandbox = {}
         vm.runInNewContext(code, sandbox)
         var url = sandbox.playerSetup.playlist[0].sources.pop()
@@ -89,6 +94,7 @@ var page = new Crawler({
             //console.log($(a).text())
             var episode_number = $(a).text()
             var href = $(a).attr('href')
+
             //console.log(/#.*/.exec(href))
             //console.log($('div' + /#.*/.exec(href)).children('span').attr('href'))
             var uri = $('div' + /#.*/.exec(href)).children('span').attr('href')
@@ -102,8 +108,13 @@ var page = new Crawler({
 
 var debug_mode = false
 if (process.argv[2] == '-d' || process.argv[2] == '--debug') {
+    debug_log_name = 'debug_log.txt'
     console.log("Debug mode turned on.")
+    console.log("Will write debug log into " + debug_log_name)
     debug_mode = true
+    logger = fs.createWriteStream(debug_log_name, {
+		defaultEncoding: 'utf8'
+    })
     var page_list = process.argv.slice(3)
 }
 else {
@@ -112,7 +123,7 @@ else {
 
 if(page_list.length > 0) {
     if (debug_mode) {
-        console.log("page_list:", page_list)
+        logger.write("page_list:" + page_list + '\n')
     }
 
     page.queue(page_list)
