@@ -18,7 +18,7 @@ function right_pad(str, len, padding_chr) {
     return str + new Array(padding_len + 1).join(padding_chr)
 }
 
-var video_callback = function(dir, name){
+var video_callback = function(dir, anime_name, episode_number){
     return function(error, result, $){
         //console.log(result)
         //console.log(dir)
@@ -40,9 +40,9 @@ var video_callback = function(dir, name){
         var url = sandbox.playerSetup.playlist[0].sources.pop()
         var type = /.*\/(.*)/.exec(url.type)[1]
         var label = url.label
-        var filename = dir + "/[" + name + "][" + label + "]." + type
+        var filename = dir + "/[" + anime_name + "]" + "[" + episode_number + "][" + label + "]." + type
         var file = fs.createWriteStream(filename)
-        var display_name = dir + ' - ' + name
+        var display_name = dir + ' - ' + episode_number
         var bar_format = right_pad(display_name, 40) + ".white[:bar].green :percent.yellow :ets sec :speed kB/s"
         var progress_bar, last_tick = 0
 
@@ -87,14 +87,14 @@ var page = new Crawler({
         $('a[href|="/thread"]').each(function(index, a){
             //console.log($(a).attr('href'))
             //console.log($(a).text())
-            var number = $(a).text()
+            var episode_number = $(a).text()
             var href = $(a).attr('href')
             //console.log(/#.*/.exec(href))
             //console.log($('div' + /#.*/.exec(href)).children('span').attr('href'))
             var uri = $('div' + /#.*/.exec(href)).children('span').attr('href')
             uri && video.queue({
                 uri: uri,
-                callback: video_callback(dir, number)
+                callback: video_callback(dir, anime_name, episode_number)
             })
         })
     }
