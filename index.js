@@ -100,9 +100,23 @@ var page = new Crawler({
     }
 })
 
-var page_list = process.argv.slice(2)
-//console.log(page_list)
-if(page_list.length > 0)
+var debug_mode = false
+if (process.argv[2] == '-d' || process.argv[2] == '--debug') {
+    console.log("Debug mode turned on.")
+    debug_mode = true
+    var page_list = process.argv.slice(3)
+}
+else {
+    var page_list = process.argv.slice(2)
+}
+
+if(page_list.length > 0) {
+    if (debug_mode) {
+        console.log("page_list:", page_list)
+    }
+
     page.queue(page_list)
-else
-    console.log("node index.js <2dg-url> [<2dg-url> ...]")
+}
+else {
+    console.log("node index.js [-d | --debug] <2dg-url> [<2dg-url> ...]")
+}
