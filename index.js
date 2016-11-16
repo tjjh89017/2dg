@@ -105,4 +105,4 @@ var page_list = process.argv.slice(2)
 if(page_list.length > 0)
     page.queue(page_list)
 else
-    console.log("node index.js <2dg-url>")
+    console.log("node index.js <2dg-url> [<2dg-url> ...]")
