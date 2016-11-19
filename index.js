@@ -18,6 +18,15 @@ function right_pad(str, len, padding_chr) {
     return str + new Array(padding_len + 1).join(padding_chr)
 }
 
+function select_possible_attribute($, attributes) {
+    for (i = 0; i < attributes.length; i++) {
+        tab = $(attributes[i])
+
+        if (tab.length > 0)
+            return tab
+    }
+}
+
 var video_callback = function(dir, anime_name, episode_number){
     return function(error, result, $){
         if (debug_mode) {
@@ -45,9 +54,16 @@ var video_callback = function(dir, anime_name, episode_number){
         var url = sandbox.playerSetup.playlist[0].sources.pop()
         var type = /.*\/(.*)/.exec(url.type)[1]
         var label = url.label
-        var filename = dir + "/[" + anime_name + "]" + "[" + episode_number + "][" + label + "]." + type
+        if (episode_number)
+            var filename = dir + "/[" + anime_name + "]" + "[" + episode_number + "][" + label + "]." + type
+        else
+            var filename = dir + "/[" + anime_name + "]" + "[" + label + "]." + type
         var file = fs.createWriteStream(filename)
-        var display_name = dir + ' - ' + episode_number
+
+        if (episode_number)
+            var display_name = dir + ' - ' + episode_number
+        else
+            var display_name = dir
         var bar_format = right_pad(display_name, 40) + ".white[:bar].green :percent.yellow :ets sec :speed kB/s"
         var progress_bar, last_tick = 0
 
@@ -87,22 +103,58 @@ var page = new Crawler({
         anime_name = (name[1] == undefined ? '' : name[1].trim())
         anime_status = (name[2] == undefined ? '' : name[2].trim())
         dir = "[" + anime_name + "]" + anime_status
+        if (debug_mode) {
+            logger.write('name: ' + name + '\n')
+            logger.write('anime_name: ' + anime_name + '\n')
+            logger.write('anime_status' + anime_status + '\n')
+            logger.write('dir: ' + dir + '\n')
+        }
+
         fs.existsSync(dir) || fs.mkdirSync(dir)
 
-        $('a[href|="/thread"]').each(function(index, a){
-            //console.log($(a).attr('href'))
-            //console.log($(a).text())
-            var episode_number = $(a).text()
-            var href = $(a).attr('href')
+        var episode_number = ''
 
-            //console.log(/#.*/.exec(href))
-            //console.log($('div' + /#.*/.exec(href)).children('span').attr('href'))
-            var uri = $('div' + /#.*/.exec(href)).children('span').attr('href')
-            uri && video.queue({
-                uri: uri,
-                callback: video_callback(dir, anime_name, episode_number)
+        multi_tabs = $('a[href|="/thread"]')
+        if (multi_tabs.length > 0) {
+            if (debug_mode) {
+                logger.write('multi_tabs' + '\n')
+                logger.write('multi_tabs.length: ' + multi_tabs.length + '\n')
+                logger.write('multi_tabs: ' + multi_tabs + '\n')
+            }
+
+            multi_tabs.each(function(index, a){
+                episode_number = $(a).text()
+                var href = $(a).attr('href')
+                if (debug_mode) {
+                    logger.write('episode_number: ' + episode_number + '\n')
+                    logger.write('href: ' + href + '\n')
+                }
+
+                var uri = $('div' + /#.*/.exec(href)).children('span').attr('href')
+                uri && video.queue({
+                    uri: uri,
+                    callback: video_callback(dir, anime_name, episode_number)
+                })
             })
-        })
+        }
+        else {
+            // single tab
+            possible_attributes = ['td.t_f > div > span', 'td.t_f > span']
+            single_tab = select_possible_attribute($, possible_attributes)
+
+            if (debug_mode) {
+                logger.write('single_tab' + '\n')
+                logger.write('single_tab.length: ' + single_tab.length + '\n')
+                logger.write('single_tab: ' + single_tab + '\n')
+            }
+
+             var uri = single_tab.attr('href')
+             uri && video.queue({
+                 uri: uri,
+                 callback: video_callback(dir, anime_name, episode_number)
+             })
+
+        }
     }
 })
 
@@ -113,7 +165,7 @@ if (process.argv[2] == '-d' || process.argv[2] == '--debug') {
     console.log("Will write debug log into " + debug_log_name)
     debug_mode = true
     logger = fs.createWriteStream(debug_log_name, {
-		defaultEncoding: 'utf8'
+        defaultEncoding: 'utf8'
     })
     var page_list = process.argv.slice(3)
 }
