@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 const Crawler = require("crawler")
 const fs = require("fs")
 const vm = require('vm')
@@ -33,6 +34,7 @@ var video_callback = function(dir, anime_name, episode_number){
             logger.write('result: ' + result + '\n')
             logger.write('dir: ' + dir + '\n')
             logger.write('name: ' + name + '\n')
+            logger.write('episode_number: ' + episode_number + '\n')
         }
 
         // parse js code
@@ -52,6 +54,12 @@ var video_callback = function(dir, anime_name, episode_number){
         const sandbox = {}
         vm.runInNewContext(code, sandbox)
         var url = sandbox.playerSetup.playlist[0].sources.pop()
+        if (url === undefined) {
+            if (debug_mode)
+                logger.write('Skip [' + anime_name + '][' + episode_number + '] because url is undefined.')
+            return
+        }
+
         var type = /.*\/(.*)/.exec(url.type)[1]
         var label = url.label
         if (episode_number)
