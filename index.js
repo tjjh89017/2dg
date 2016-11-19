@@ -18,6 +18,15 @@ function right_pad(str, len, padding_chr) {
     return str + new Array(padding_len + 1).join(padding_chr)
 }
 
+function select_possible_attribute($, attributes) {
+    for (i = 0; i < attributes.length; i++) {
+        tab = $(attributes[i])
+
+        if (tab.length > 0)
+            return tab
+    }
+}
+
 var video_callback = function(dir, anime_name, episode_number){
     return function(error, result, $){
         if (debug_mode) {
@@ -130,7 +139,8 @@ var page = new Crawler({
         }
         else {
             // single tab
-            single_tab = $('td.t_f > div > span')
+            possible_attributes = ['td.t_f > div > span', 'td.t_f > span']
+            single_tab = select_possible_attribute($, possible_attributes)
 
             if (debug_mode) {
                 logger.write('single_tab' + '\n')
