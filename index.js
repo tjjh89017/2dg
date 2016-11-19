@@ -87,13 +87,26 @@ var page = new Crawler({
         anime_name = (name[1] == undefined ? '' : name[1].trim())
         anime_status = (name[2] == undefined ? '' : name[2].trim())
         dir = "[" + anime_name + "]" + anime_status
+        if (debug_mode) {
+            logger.write('name: ' + name + '\n')
+            logger.write('anime_name: ' + anime_name + '\n')
+            logger.write('anime_status' + anime_status + '\n')
+            logger.write('dir: ' + dir + '\n')
+        }
+
         fs.existsSync(dir) || fs.mkdirSync(dir)
 
+        var episode_number = ''
+        console.log($('span[href|="http://embed.2d-gate.org/"]'))
         $('a[href|="/thread"]').each(function(index, a){
             //console.log($(a).attr('href'))
             //console.log($(a).text())
-            var episode_number = $(a).text()
+            episode_number = $(a).text()
             var href = $(a).attr('href')
+            if (debug_mode) {
+                logger.write('episode_number: ' + episode_number + '\n')
+                logger.write('href: ' + href + '\n')
+            }
 
             //console.log(/#.*/.exec(href))
             //console.log($('div' + /#.*/.exec(href)).children('span').attr('href'))
