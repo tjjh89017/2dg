@@ -19,9 +19,9 @@ function right_pad(str, len, padding_chr) {
     return str + new Array(padding_len + 1).join(padding_chr)
 }
 
-function select_possible_attribute($, attributes) {
+function select_possible_attribute(jQuery, attributes) {
     for (i = 0; i < attributes.length; i++) {
-        tab = $(attributes[i])
+        tab = jQuery(attributes[i])
 
         if (tab.length > 0)
             return tab
@@ -29,7 +29,7 @@ function select_possible_attribute($, attributes) {
 }
 
 var video_callback = function(dir, anime_name, episode_number){
-    return function(error, result, $){
+    return function(error, result, jQuery){
         if (debug_mode) {
             logger.write('result: ' + result + '\n')
             logger.write('dir: ' + dir + '\n')
@@ -38,8 +38,7 @@ var video_callback = function(dir, anime_name, episode_number){
         }
 
         // parse js code
-        //var code = /eval\((.*)\);/.exec($("script").last().text())[1]
-        var code = $("script").last().text()
+        var code = jQuery("script").last().text()
         if (debug_mode) {
             logger.write('code: ' + code + '\n')
         }
@@ -106,8 +105,8 @@ var video = new Crawler({
 
 var page = new Crawler({
     forceUTF8: true,
-    callback: function(error, result, $){
-        name = /^([^\[]*)\[.*\[.*\]\]\W+\](\[.*\])?$/.exec($('a#thread_subject').text())
+    callback: function(error, result, jQuery){
+        name = /^([^\[]*)\[.*\[.*\]\]\W+\](\[.*\])?$/.exec(jQuery('a#thread_subject').text())
         anime_name = (name[1] == undefined ? '' : name[1].trim())
         anime_status = (name[2] == undefined ? '' : name[2].trim())
         dir = "[" + anime_name + "]" + anime_status
@@ -122,7 +121,7 @@ var page = new Crawler({
 
         var episode_number = ''
 
-        multi_tabs = $('a[href|="/thread"]')
+        multi_tabs = jQuery('a[href|="/thread"]')
         if (multi_tabs.length > 0) {
             if (debug_mode) {
                 logger.write('multi_tabs' + '\n')
@@ -131,14 +130,14 @@ var page = new Crawler({
             }
 
             multi_tabs.each(function(index, a){
-                episode_number = $(a).text()
-                var href = $(a).attr('href')
+                episode_number = jQuery(a).text()
+                var href = jQuery(a).attr('href')
                 if (debug_mode) {
                     logger.write('episode_number: ' + episode_number + '\n')
                     logger.write('href: ' + href + '\n')
                 }
 
-                var uri = $('div' + /#.*/.exec(href)).children('span').attr('href')
+                var uri = jQuery('div' + /#.*/.exec(href)).children('span').attr('href')
                 uri && video.queue({
                     uri: uri,
                     callback: video_callback(dir, anime_name, episode_number)
@@ -148,7 +147,7 @@ var page = new Crawler({
         else {
             // single tab
             possible_attributes = ['td.t_f > div > span', 'td.t_f > span']
-            single_tab = select_possible_attribute($, possible_attributes)
+            single_tab = select_possible_attribute(jQuery, possible_attributes)
 
             if (debug_mode) {
                 logger.write('single_tab' + '\n')
