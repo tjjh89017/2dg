@@ -31,14 +31,27 @@ function select_possible_attribute(jQuery, attributes) {
 var video_callback = function(dir, anime_name, episode_number){
     return function(error, result, jQuery){
         if (debug_mode) {
-            logger.write('result: ' + result + '\n')
+            logger.write('result: ' + JSON.stringify(result) + '\n')
             logger.write('dir: ' + dir + '\n')
             logger.write('name: ' + name + '\n')
             logger.write('episode_number: ' + episode_number + '\n')
         }
 
         // parse js code
-        var code = jQuery("script").last().text()
+        var codes = jQuery('script'), code = null
+        for (var i = 0; i < codes.length; i++) {
+            var script = jQuery(codes[i]).text()
+            if (script.indexOf('2,d,g,a,t,e') > -1) {
+                code = script
+                break
+            }
+        }
+
+        if (!code) {
+            console.log('failed: ' + anime_name + ' - ' + episode_number)
+            return
+        }
+
         if (debug_mode) {
             logger.write('code: ' + code + '\n')
         }
